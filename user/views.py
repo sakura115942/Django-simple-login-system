@@ -1,13 +1,17 @@
 from django.shortcuts import render, redirect
 from django.contrib import auth, messages
+from django.views import View
 
 from .models import User
 
 # Create your views here.
 
 
-def register(request):
-    if request.method == 'POST':
+class RegisterView(View):
+    def get(self, request):
+        return render(request, 'register.html')
+
+    def post(self, request):
         username = request.POST['username']
         password = request.POST['password']
         if User.objects.filter(username=username).exists():
@@ -19,11 +23,14 @@ def register(request):
             user.save()
             messages.success(request, 'register success')
             return redirect('user:login')
-    return render(request, 'register.html')
 
 
-def login(request):
-    if request.method == 'POST':
+class LoginView(View):
+
+    def get(self, request):
+        return render(request, 'login.html')
+
+    def post(self, request):
         username = request.POST['username']
         password = request.POST['password']
         user = auth.authenticate(request, username=username, password=password)
@@ -34,8 +41,6 @@ def login(request):
         else:
             messages.error(request, 'login error')
             return render(request, 'login.html')
-
-    return render(request, 'login.html')
 
 
 def logout(request):
