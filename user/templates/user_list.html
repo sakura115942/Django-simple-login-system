@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+    user list
+{% endblock %}
+
+{% block content %}
+
+    <h1>User List Page</h1>
+    <ul>
+        {% for object in object_list %}
+            <li>{{ object.username }}</li>
+            <li>{{ object.last_login }}</li>
+            <li>{{ object.date_joined }}</li>
+            <hr/>
+        {% empty %}
+            li>No objects yet.</li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
