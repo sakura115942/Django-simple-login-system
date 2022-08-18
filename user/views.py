@@ -1,6 +1,9 @@
+from wsgiref.simple_server import demo_app
 from django.shortcuts import render, redirect
 from django.contrib import auth, messages
 from django.views import View
+from django.views.generic import DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import User
 
@@ -47,3 +50,19 @@ def logout(request):
     auth.logout(request)
     messages.success(request, 'logout success')
     return redirect('index')
+
+class MessageLoginRequiredMixin(LoginRequiredMixin):
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, self.permission_denied_message)
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class UserDetailView(MessageLoginRequiredMixin, DetailView):
+    model = User
+    template_name = 'user_detail.html'
+
+    login_url = 'user:login'
+    permission_denied_message = 'You need to login first to continue'
