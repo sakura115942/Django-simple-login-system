@@ -6,7 +6,7 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
 
-    is_auther = models.BooleanField(default=False)
+    is_auth = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.username
