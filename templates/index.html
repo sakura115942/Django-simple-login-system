@@ -11,7 +11,7 @@
     {% if request.user.is_authenticated %}
         <h1>Welcome! {{ request.user }}</h1>
         <a href="user/{{ request.user.id }}">user detail</a> or 
-        <a href="{% url 'user:user_list' %}">user list</a>
+        <a href="{% url 'user:list' %}">user list</a>
         <br/><br/>
         <a href="{% url 'user:logout' %}">logout</a>
     {% else %}

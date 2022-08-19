@@ -1,11 +1,12 @@
-from wsgiref.simple_server import demo_app
+from django.utils import timezone
+import datetime
 from django.shortcuts import render, redirect
 from django.contrib import auth, messages
 from django.views import View
 from django.views.generic import DetailView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import User
+from .models import User, EmailVerifyRecord
 
 # Create your views here.
 
@@ -15,17 +16,22 @@ class RegisterView(View):
         return render(request, 'register.html')
 
     def post(self, request):
+        email = request.POST['email']
         username = request.POST['username']
         password = request.POST['password']
-        if User.objects.filter(username=username).exists():
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'email is already in use')
+        elif User.objects.filter(username=username).exists():
             messages.error(request, 'username is already in use')
-            return render(request, 'register.html')
         else:
             user = User.objects.create_user(
-                username=username, password=password)
+                username=username, password=password, email=email)
             user.save()
             messages.success(request, 'register success')
             return redirect('user:login')
+
+        return render(request, 'register.html')
 
 
 class LoginView(View):
@@ -72,3 +78,24 @@ class UserDetailView(MessageLoginRequiredMixin, DetailView):
 class UserListView(MessageLoginRequiredMixin, ListView):
     model = User
     template_name = 'user_list.html'
+
+
+class UserActivationView(View):
+    effective_time = datetime.timedelta(minutes=30)
+
+    def get(self, request, code):
+        record = EmailVerifyRecord.objects.filter(code=code).get()
+        user = User.objects.filter(email=record.email).get()
+        deadline = record.send_time + self.effective_time
+        
+        if timezone.now() > deadline:
+            messages.error(request, 'verification code has expired')
+        elif user.is_auth == True:
+            messages.error(request, 'do not repeat verification')
+        else:
+            user.is_auth = True
+            user.save()
+            auth.login(request, user)
+            messages.success(request, 'verification succeeded')
+        
+        return redirect('index')

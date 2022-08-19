@@ -124,3 +124,10 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
+
+EMAIL_HOST = 'smtp.qq.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'xxxxxxxxxx@qq.com'
+EMAIL_HOST_PASSWORD = 'xxxxxxxxxx'
+EMAIL_USE_TLS = True
+EMAIL_FROM = 'xxxxxxxxxx@qq.com'
